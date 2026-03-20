@@ -150,7 +150,7 @@ fun QuizScreen(
 
                 // Progress
                 LinearProgressIndicator(
-                    progress = { (currentIndex + 1f) / questions.size },
+                    progress = (currentIndex + 1f) / questions.size,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp)

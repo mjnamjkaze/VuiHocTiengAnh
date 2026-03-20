@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.vuihoctienganh.ui.screens
 
 import androidx.compose.animation.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vuihoctienganh.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingScreen(onComplete: () -> Unit) {
     var currentStep by remember { mutableIntStateOf(0) }

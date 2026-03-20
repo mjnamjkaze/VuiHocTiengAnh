@@ -97,7 +97,7 @@ fun ReviewScreen(
 
             // Progress
             LinearProgressIndicator(
-                progress = { (currentIndex + 1f) / reviewWords.size },
+                progress = (currentIndex + 1f) / reviewWords.size,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
@@ -147,7 +147,7 @@ fun ReviewScreen(
 
                     AnimatedVisibility(visible = showAnswer, enter = fadeIn() + expandVertically()) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            HorizontalDivider(color = DarkCardAlt, modifier = Modifier.padding(vertical = 16.dp))
+                            Divider(color = DarkCardAlt, modifier = Modifier.padding(vertical = 16.dp))
                             Text(word.meaning, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = AccentYellow)
                             Spacer(modifier = Modifier.height(12.dp))
                             examples.firstOrNull()?.let { ex ->

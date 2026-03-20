@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.vuihoctienganh.ui.screens
 
 import androidx.compose.animation.core.*
@@ -30,6 +32,7 @@ import com.vuihoctienganh.data.repository.WordRepository
 import com.vuihoctienganh.ui.theme.*
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     repository: WordRepository,

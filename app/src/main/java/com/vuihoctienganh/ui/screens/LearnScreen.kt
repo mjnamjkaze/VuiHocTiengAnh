@@ -82,7 +82,7 @@ fun LearnScreen(
 
             // Progress bar
             LinearProgressIndicator(
-                progress = { (currentIndex + 1f) / words.size },
+                progress = (currentIndex + 1f) / words.size,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)
@@ -182,7 +182,7 @@ fun LearnScreen(
                         enter = fadeIn() + expandVertically()
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            HorizontalDivider(color = DarkCardAlt, modifier = Modifier.padding(vertical = 12.dp))
+                            Divider(color = DarkCardAlt, modifier = Modifier.padding(vertical = 12.dp))
 
                             Text(
                                 word.meaning,
