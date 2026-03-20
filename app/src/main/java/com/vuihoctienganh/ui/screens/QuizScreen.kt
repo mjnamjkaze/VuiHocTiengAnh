@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 fun QuizScreen(
     repository: WordRepository,
     audioEngine: AudioEngine,
+    learnedWordIds: List<Int> = emptyList(),
     onFinish: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -42,7 +43,11 @@ fun QuizScreen(
 
     LaunchedEffect(Unit) {
         val levels = listOf("A1", "A2")
-        val words = repository.getDailyNewWords(WordSource.COCA, levels, 5)
+        val words = if (learnedWordIds.isNotEmpty()) {
+            repository.getWordsByIds(learnedWordIds)
+        } else {
+            repository.getDailyNewWords(WordSource.COCA, levels, 5)
+        }
         if (words.isEmpty()) {
             showSummary = true
             isLoading = false
