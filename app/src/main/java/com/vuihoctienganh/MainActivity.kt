@@ -16,8 +16,10 @@ import com.vuihoctienganh.engine.AudioEngine
 import com.vuihoctienganh.ui.navigation.NavGraph
 import com.vuihoctienganh.ui.theme.DarkBg
 import com.vuihoctienganh.ui.theme.VuiHocTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     private lateinit var audioEngine: AudioEngine
@@ -29,33 +31,34 @@ class MainActivity : ComponentActivity() {
         val app = application as VuiHocApp
         audioEngine = AudioEngine(this)
 
+        // Read onboarding state ONCE, synchronously, before rendering
+        val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
+        val isFirstLaunch = runBlocking {
+            dataStore.data.first().let { prefs ->
+                !(prefs[onboardingCompleteKey] ?: false)
+            }
+        }
+
         setContent {
             VuiHocTheme {
                 val context = LocalContext.current
                 val scope = rememberCoroutineScope()
                 val navController = rememberNavController()
 
-                val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
-                val isFirstLaunch by context.dataStore.data
-                    .map { !(it[onboardingCompleteKey] ?: false) }
-                    .collectAsState(initial = null as Boolean?)
-
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = DarkBg
                 ) {
-                    if (isFirstLaunch != null) {
-                        NavGraph(
-                            navController = navController,
-                            repository = app.repository,
-                            audioEngine = audioEngine,
-                            isFirstLaunch = isFirstLaunch!!
-                        )
-                    }
+                    NavGraph(
+                        navController = navController,
+                        repository = app.repository,
+                        audioEngine = audioEngine,
+                        isFirstLaunch = isFirstLaunch
+                    )
                 }
 
                 // Mark onboarding complete when navigating away from it
-                LaunchedEffect(navController) {
+                LaunchedEffect(Unit) {
                     navController.addOnDestinationChangedListener { _, destination, _ ->
                         if (destination.route != "onboarding") {
                             scope.launch {

@@ -1,5 +1,6 @@
 package com.vuihoctienganh.data.repository
 
+import android.content.Context
 import com.vuihoctienganh.data.db.dao.*
 import com.vuihoctienganh.data.db.entity.*
 import com.vuihoctienganh.data.source.DataSeeder
@@ -16,10 +17,10 @@ class WordRepository(
 ) {
     // ===== Initialization =====
 
-    suspend fun seedDatabaseIfNeeded() {
+    suspend fun seedDatabaseIfNeeded(context: Context) {
         val count = wordDao.getWordCount("coca")
         if (count == 0) {
-            wordDao.insertAll(DataSeeder.getAllWords())
+            wordDao.insertAll(DataSeeder.getAllWords(context))
         }
     }
 

@@ -38,8 +38,13 @@ fun LearnScreen(
     val learnedWordIds = remember { mutableListOf<Int>() }
 
     LaunchedEffect(Unit) {
-        val levels = listOf("A1", "A2") // TODO: based on user setting
-        words = repository.getDailyNewWords(WordSource.COCA, levels, 5)
+        try {
+            val levels = listOf("A1", "A2") // TODO: based on user setting
+            words = repository.getDailyNewWords(WordSource.COCA, levels, 5)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            words = emptyList()
+        }
         isLoading = false
     }
 
@@ -77,7 +82,7 @@ fun LearnScreen(
                     }
                 }
             }
-        } else {
+        } else if (currentIndex < words.size) {
             val word = words[currentIndex]
             val examples = QuizEngine.parseExamples(word.examples)
 

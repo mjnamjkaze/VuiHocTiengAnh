@@ -29,7 +29,7 @@ class VuiHocApp : Application() {
         super.onCreate()
         // Seed database on first launch
         applicationScope.launch {
-            repository.seedDatabaseIfNeeded()
+            repository.seedDatabaseIfNeeded(this@VuiHocApp)
         }
     }
 }
