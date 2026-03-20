@@ -67,11 +67,22 @@ class MainActivity : ComponentActivity() {
                                 androidx.compose.foundation.lazy.LazyColumn { item { androidx.compose.material3.Text(lastCrash!!, color = TextPrimary, fontSize = 12.sp) } }
                             }
                             androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
-                            androidx.compose.material3.Button(onClick = {
-                                prefs.edit().remove("last_crash").apply()
-                                lastCrash = null
-                            }, colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = AccentGreen)) {
-                                androidx.compose.material3.Text("Clear & Continue", color = DarkBg)
+                            androidx.compose.foundation.layout.Row {
+                                androidx.compose.material3.Button(onClick = {
+                                    val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                    val clip = android.content.ClipData.newPlainText("Crash Log", lastCrash)
+                                    clipboard.setPrimaryClip(clip)
+                                    android.widget.Toast.makeText(context, "Đã copy lỗi!", android.widget.Toast.LENGTH_SHORT).show()
+                                }, colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = AccentBlue)) {
+                                    androidx.compose.material3.Text("Copy Lỗi", color = DarkBg)
+                                }
+                                androidx.compose.foundation.layout.Spacer(Modifier.width(16.dp))
+                                androidx.compose.material3.Button(onClick = {
+                                    prefs.edit().remove("last_crash").apply()
+                                    lastCrash = null
+                                }, colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = AccentGreen)) {
+                                    androidx.compose.material3.Text("Clear & Continue", color = DarkBg)
+                                }
                             }
                         }
                     } else {
