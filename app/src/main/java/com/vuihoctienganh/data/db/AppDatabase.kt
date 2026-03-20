@@ -14,7 +14,7 @@ import com.vuihoctienganh.data.db.entity.*
         QuizHistoryEntity::class,
         DailyStatsEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

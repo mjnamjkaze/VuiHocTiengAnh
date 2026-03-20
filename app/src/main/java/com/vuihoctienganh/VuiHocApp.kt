@@ -27,6 +27,15 @@ class VuiHocApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Setup crash handler
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+            val prefs = getSharedPreferences("crash_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("last_crash", android.util.Log.getStackTraceString(exception)).commit()
+            defaultHandler?.uncaughtException(thread, exception)
+        }
+
         // Seed database on first launch
         applicationScope.launch {
             repository.seedDatabaseIfNeeded(this@VuiHocApp)

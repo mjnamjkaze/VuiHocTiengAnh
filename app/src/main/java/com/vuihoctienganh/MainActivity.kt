@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,8 +15,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.navigation.compose.rememberNavController
 import com.vuihoctienganh.engine.AudioEngine
 import com.vuihoctienganh.ui.navigation.NavGraph
-import com.vuihoctienganh.ui.theme.DarkBg
-import com.vuihoctienganh.ui.theme.VuiHocTheme
+import com.vuihoctienganh.ui.theme.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -49,12 +51,37 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = DarkBg
                 ) {
-                    NavGraph(
-                        navController = navController,
-                        repository = app.repository,
-                        audioEngine = audioEngine,
-                        isFirstLaunch = isFirstLaunch
-                    )
+                    val prefs = LocalContext.current.getSharedPreferences("crash_prefs", android.content.Context.MODE_PRIVATE)
+                    var lastCrash by remember { mutableStateOf(prefs.getString("last_crash", null)) }
+
+                    if (lastCrash != null) {
+                        // Display crash report
+                        androidx.compose.foundation.layout.Column(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                        ) {
+                            androidx.compose.material3.Text("🚨 APP CRASHED!", color = WrongRed, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 24.sp)
+                            androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
+                            // Scrollable text
+                            androidx.compose.foundation.layout.Box(modifier = Modifier.weight(1f).background(DarkCard).padding(8.dp)) {
+                                androidx.compose.foundation.lazy.LazyColumn { item { androidx.compose.material3.Text(lastCrash!!, color = TextPrimary, fontSize = 12.sp) } }
+                            }
+                            androidx.compose.foundation.layout.Spacer(Modifier.height(16.dp))
+                            androidx.compose.material3.Button(onClick = {
+                                prefs.edit().remove("last_crash").apply()
+                                lastCrash = null
+                            }, colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = AccentGreen)) {
+                                androidx.compose.material3.Text("Clear & Continue", color = DarkBg)
+                            }
+                        }
+                    } else {
+                        NavGraph(
+                            navController = navController,
+                            repository = app.repository,
+                            audioEngine = audioEngine,
+                            isFirstLaunch = isFirstLaunch
+                        )
+                    }
                 }
 
                 // Mark onboarding complete when navigating away from it
