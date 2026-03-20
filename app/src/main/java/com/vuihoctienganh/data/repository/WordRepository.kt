@@ -30,6 +30,14 @@ class WordRepository(
         return wordDao.getNewWords(source.name.lowercase(), levels, count)
     }
 
+    suspend fun getAvailableTopics(source: WordSource, levels: List<String>): List<String> {
+        return wordDao.getAvailableTopics(source.name.lowercase(), levels)
+    }
+
+    suspend fun getNewWordsByTopic(source: WordSource, levels: List<String>, topic: String, count: Int = 5): List<WordEntity> {
+        return wordDao.getNewWordsByTopic(source.name.lowercase(), levels, topic, count)
+    }
+
     suspend fun getRandomDistractors(source: WordSource, levels: List<String>, excludeId: Int, count: Int = 3): List<WordEntity> {
         return wordDao.getRandomWords(source.name.lowercase(), levels, excludeId, count)
     }

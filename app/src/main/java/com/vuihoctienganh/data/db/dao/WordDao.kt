@@ -46,4 +46,25 @@ interface WordDao {
 
     @Query("SELECT DISTINCT source FROM words")
     suspend fun getAvailableSources(): List<String>
+
+    @Query("""
+        SELECT DISTINCT w.topic FROM words w
+        LEFT JOIN user_words uw ON w.id = uw.wordId
+        WHERE w.source = :source AND w.level IN (:levels)
+        AND (uw.status IS NULL OR uw.status = 'new')
+        ORDER BY w.topic
+    """)
+    suspend fun getAvailableTopics(source: String, levels: List<String>): List<String>
+
+    @Query("""
+        SELECT w.* FROM words w
+        LEFT JOIN user_words uw ON w.id = uw.wordId
+        WHERE w.source = :source 
+        AND w.level IN (:levels)
+        AND w.topic = :topic
+        AND (uw.status IS NULL OR uw.status = 'new')
+        ORDER BY w.id
+        LIMIT :limit
+    """)
+    suspend fun getNewWordsByTopic(source: String, levels: List<String>, topic: String, limit: Int): List<WordEntity>
 }

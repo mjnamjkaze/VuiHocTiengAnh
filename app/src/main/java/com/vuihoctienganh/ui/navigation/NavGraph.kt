@@ -34,17 +34,25 @@ fun NavGraph(
         composable(Screen.Home.route) {
             HomeScreen(
                 repository = repository,
-                onStartLearn = { navController.navigate(Screen.Learn.route) },
+                onStartLearn = { topic -> 
+                    val route = if (topic != null) "${Screen.Learn.route}?topic=$topic" else Screen.Learn.route
+                    navController.navigate(route) 
+                },
                 onStartReview = { navController.navigate(Screen.Review.route) },
                 onOpenHistory = { navController.navigate(Screen.History.route) },
                 onSelectSource = { navController.navigate(Screen.SourceSelect.route) }
             )
         }
 
-        composable(Screen.Learn.route) {
+        composable(
+            route = "${Screen.Learn.route}?topic={topic}",
+            arguments = listOf(navArgument("topic") { type = NavType.StringType; nullable = true })
+        ) { backStackEntry ->
+            val topic = backStackEntry.arguments?.getString("topic")
             LearnScreen(
                 repository = repository,
                 audioEngine = audioEngine,
+                topic = topic,
                 onFinish = { learnedWordIds ->
                     val idsParam = learnedWordIds.joinToString(",")
                     navController.navigate("quiz?wordIds=$idsParam") {

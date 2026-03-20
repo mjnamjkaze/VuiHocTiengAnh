@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 fun LearnScreen(
     repository: WordRepository,
     audioEngine: AudioEngine,
+    topic: String? = null,
     onFinish: (List<Int>) -> Unit,
     onBack: () -> Unit
 ) {
@@ -40,7 +41,11 @@ fun LearnScreen(
     LaunchedEffect(Unit) {
         try {
             val levels = listOf("A1", "A2") // TODO: based on user setting
-            words = repository.getDailyNewWords(WordSource.COCA, levels, 5)
+            words = if (topic != null) {
+                repository.getNewWordsByTopic(WordSource.COCA, levels, topic, 5)
+            } else {
+                repository.getDailyNewWords(WordSource.COCA, levels, 5)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             words = emptyList()

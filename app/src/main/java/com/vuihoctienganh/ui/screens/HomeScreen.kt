@@ -6,6 +6,8 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +38,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     repository: WordRepository,
-    onStartLearn: () -> Unit,
+    onStartLearn: (String?) -> Unit,
     onStartReview: () -> Unit,
     onOpenHistory: () -> Unit,
     onSelectSource: () -> Unit
@@ -47,6 +49,8 @@ fun HomeScreen(
     val learnedCount by repository.getLearnedCount().collectAsState(initial = 0)
     var streak by remember { mutableIntStateOf(0) }
     val recentStats by repository.getRecentStats(7).collectAsState(initial = emptyList())
+    var showTopicDialog by remember { mutableStateOf(false) }
+    var availableTopics by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val todayStats = recentStats.firstOrNull()
     val todayLearned = todayStats?.wordsLearned ?: 0
@@ -63,6 +67,48 @@ fun HomeScreen(
             .padding(20.dp)
     ) {
         Spacer(modifier = Modifier.height(24.dp))
+
+        if (showTopicDialog) {
+            AlertDialog(
+                onDismissRequest = { showTopicDialog = false },
+                title = { Text("Chọn chủ đề", color = TextPrimary) },
+                text = {
+                    if (availableTopics.isEmpty()) {
+                        CircularProgressIndicator(color = AccentGreen)
+                    } else {
+                        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                            items(availableTopics) { topic ->
+                                TextButton(
+                                    onClick = {
+                                        showTopicDialog = false
+                                        onStartLearn(topic)
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(topic, color = AccentGreen, fontSize = 16.sp)
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showTopicDialog = false
+                        onStartLearn(null)
+                    }) {
+                        Text("Học ngẫu nhiên", color = AccentBlue)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showTopicDialog = false }) {
+                        Text("Hủy", color = TextSecondary)
+                    }
+                },
+                containerColor = DarkCard,
+                titleContentColor = TextPrimary,
+                textContentColor = TextSecondary
+            )
+        }
 
         // Header
         Row(
@@ -187,11 +233,18 @@ fun HomeScreen(
             ActionCard(
                 modifier = Modifier.weight(1f),
                 title = "Học từ mới",
-                subtitle = "5 từ/ngày",
+                subtitle = "5 từ mỗi lượt",
                 emoji = "📖",
                 gradientColors = listOf(AccentGreen, Teal400),
-                onClick = onStartLearn,
-                enabled = todayLearned < 5
+                onClick = {
+                    scope.launch {
+                        // TODO: use current selected source and levels from UserPreferences
+                        val topics = repository.getAvailableTopics(com.vuihoctienganh.data.source.WordSource.COCA, listOf("A1", "A2"))
+                        availableTopics = topics
+                        showTopicDialog = true
+                    }
+                },
+                enabled = true
             )
             ActionCard(
                 modifier = Modifier.weight(1f),
