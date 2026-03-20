@@ -4,7 +4,8 @@
     <application
         android:name=".VuiHocApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_app_icon"
+        android:roundIcon="@drawable/ic_app_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.VuiHocTiengAnh">
