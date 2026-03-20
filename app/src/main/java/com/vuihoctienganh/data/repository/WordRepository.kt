@@ -41,6 +41,10 @@ class WordRepository(
         return wordDao.getWordById(id)
     }
 
+    suspend fun getWordsByIds(ids: List<Int>): List<WordEntity> {
+        return wordDao.getWordsByIds(ids)
+    }
+
     // ===== User Progress =====
 
     suspend fun getUserWord(wordId: Int): UserWordEntity? {

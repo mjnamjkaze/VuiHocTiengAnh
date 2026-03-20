@@ -41,6 +41,9 @@ interface WordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(words: List<WordEntity>)
 
+    @Query("SELECT * FROM words WHERE id IN (:ids)")
+    suspend fun getWordsByIds(ids: List<Int>): List<WordEntity>
+
     @Query("SELECT DISTINCT source FROM words")
     suspend fun getAvailableSources(): List<String>
 }

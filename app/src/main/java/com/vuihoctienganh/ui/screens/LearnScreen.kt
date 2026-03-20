@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 fun LearnScreen(
     repository: WordRepository,
     audioEngine: AudioEngine,
-    onFinish: () -> Unit,
+    onFinish: (List<Int>) -> Unit,
     onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -35,6 +35,7 @@ fun LearnScreen(
     var currentIndex by remember { mutableIntStateOf(0) }
     var showMeaning by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
+    val learnedWordIds = remember { mutableListOf<Int>() }
 
     LaunchedEffect(Unit) {
         val levels = listOf("A1", "A2") // TODO: based on user setting
@@ -244,7 +245,8 @@ fun LearnScreen(
                         scope.launch {
                             repository.markWordUnknown(word.id)
                             repository.updateDailyStats(wordsLearned = 1)
-                            moveToNext(currentIndex, words.size, { currentIndex = it }, { showMeaning = false }, onFinish)
+                            learnedWordIds.add(word.id)
+                            moveToNext(currentIndex, words.size, { currentIndex = it }, { showMeaning = false }) { onFinish(learnedWordIds) }
                         }
                     },
                     modifier = Modifier
@@ -262,7 +264,8 @@ fun LearnScreen(
                         scope.launch {
                             repository.markWordKnown(word.id)
                             repository.updateDailyStats(wordsLearned = 1)
-                            moveToNext(currentIndex, words.size, { currentIndex = it }, { showMeaning = false }, onFinish)
+                            learnedWordIds.add(word.id)
+                            moveToNext(currentIndex, words.size, { currentIndex = it }, { showMeaning = false }) { onFinish(learnedWordIds) }
                         }
                     },
                     modifier = Modifier

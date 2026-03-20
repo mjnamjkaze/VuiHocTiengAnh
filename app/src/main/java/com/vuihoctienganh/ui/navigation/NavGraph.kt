@@ -2,8 +2,10 @@ package com.vuihoctienganh.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.vuihoctienganh.data.repository.WordRepository
 import com.vuihoctienganh.engine.AudioEngine
 import com.vuihoctienganh.ui.screens.*
@@ -43,8 +45,9 @@ fun NavGraph(
             LearnScreen(
                 repository = repository,
                 audioEngine = audioEngine,
-                onFinish = {
-                    navController.navigate(Screen.Quiz.route) {
+                onFinish = { learnedWordIds ->
+                    val idsParam = learnedWordIds.joinToString(",")
+                    navController.navigate("quiz?wordIds=$idsParam") {
                         popUpTo(Screen.Learn.route) { inclusive = true }
                     }
                 },
@@ -52,10 +55,20 @@ fun NavGraph(
             )
         }
 
-        composable(Screen.Quiz.route) {
+        composable(
+            route = "quiz?wordIds={wordIds}",
+            arguments = listOf(navArgument("wordIds") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val wordIdsStr = backStackEntry.arguments?.getString("wordIds") ?: ""
+            val wordIds = if (wordIdsStr.isNotEmpty()) {
+                wordIdsStr.split(",").mapNotNull { it.toIntOrNull() }
+            } else {
+                emptyList()
+            }
             QuizScreen(
                 repository = repository,
                 audioEngine = audioEngine,
+                learnedWordIds = wordIds,
                 onFinish = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }

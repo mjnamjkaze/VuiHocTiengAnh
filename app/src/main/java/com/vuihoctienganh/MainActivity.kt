@@ -38,18 +38,20 @@ class MainActivity : ComponentActivity() {
                 val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
                 val isFirstLaunch by context.dataStore.data
                     .map { !(it[onboardingCompleteKey] ?: false) }
-                    .collectAsState(initial = true)
+                    .collectAsState(initial = null as Boolean?)
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = DarkBg
                 ) {
-                    NavGraph(
-                        navController = navController,
-                        repository = app.repository,
-                        audioEngine = audioEngine,
-                        isFirstLaunch = isFirstLaunch
-                    )
+                    if (isFirstLaunch != null) {
+                        NavGraph(
+                            navController = navController,
+                            repository = app.repository,
+                            audioEngine = audioEngine,
+                            isFirstLaunch = isFirstLaunch!!
+                        )
+                    }
                 }
 
                 // Mark onboarding complete when navigating away from it
