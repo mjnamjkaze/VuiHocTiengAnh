@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vuihoctienganh.data.repository.WordRepository
 import com.vuihoctienganh.data.source.WordSource
 import com.vuihoctienganh.ui.theme.*
 import androidx.datastore.preferences.core.edit
@@ -24,14 +25,25 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SourceSelectScreen(onBack: () -> Unit) {
+fun SourceSelectScreen(repository: WordRepository, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val selectedSourceKey = stringPreferencesKey("selected_source")
     val currentSource by context.dataStore.data
         .map { it[selectedSourceKey] ?: WordSource.COCA.name }
         .collectAsState(initial = WordSource.COCA.name)
+
+    var wordCounts by remember { mutableStateOf<Map<WordSource, Int>>(emptyMap()) }
+    
+    LaunchedEffect(Unit) {
+        val counts = mutableMapOf<WordSource, Int>()
+        for (source in WordSource.entries) {
+            counts[source] = repository.getWordCountForSource(source)
+        }
+        wordCounts = counts
+    }
 
     Column(
         modifier = Modifier
@@ -67,12 +79,8 @@ fun SourceSelectScreen(onBack: () -> Unit) {
         ) {
             items(WordSource.entries.toList()) { source ->
                 val isSelected = currentSource == source.name
-                val wordCount = when (source) {
-                    WordSource.COCA -> "100 từ"
-                    WordSource.BNC -> "50 từ"
-                    WordSource.SLANG -> "30 từ"
-                    WordSource.IDIOM -> "30 thành ngữ"
-                }
+                val countLabel = wordCounts[source] ?: "..."
+                val wordCount = if (source == WordSource.IDIOM) "$countLabel thành ngữ" else "$countLabel từ"
                 val details = when (source) {
                     WordSource.COCA -> "Từ phổ biến nhất trong giao tiếp Mỹ. Phân level A1-B2. Phù hợp luyện nói hàng ngày."
                     WordSource.BNC -> "Từ vựng học thuật & công sở từ British National Corpus. Tốt cho TOEIC & IELTS."

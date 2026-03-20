@@ -46,6 +46,10 @@ class WordRepository(
         return wordDao.getWordsBySource(source.name.lowercase())
     }
 
+    suspend fun getWordCountForSource(source: WordSource): Int {
+        return wordDao.getWordCount(source.name.lowercase())
+    }
+
     suspend fun getWordById(id: Int): WordEntity? {
         return wordDao.getWordById(id)
     }
